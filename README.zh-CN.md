@@ -117,8 +117,8 @@ SQL语法高亮显示和自动完成功能，以增强用户体验并提高查�
 
 ## 联系我们
 
-E-mail: henry@yearning.io
-E-mail: einicyeo@gmail.com
+E-mail: henry@yearning.io  
+E-mail: einicyeo@gmail.com  
 
 Yearning 使用交流QQ群 1群: 747364310(已满) 2群:363323798
 

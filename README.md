@@ -126,8 +126,8 @@ Support DingDing relay push to wechat, Supports 2FA multi-factor authentication
 
 ## Contact Us
 
-E-mail: henry@yearning.io
-E-mail: einicyeo@gmail.com
+E-mail: henry@yearning.io  
+E-mail: einicyeo@gmail.com   
 
 ## License
 
