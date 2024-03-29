@@ -1,0 +1,130 @@
+package personal
+
+import (
+	"Yearning-go/src/handler/common"
+	"Yearning-go/src/i18n"
+	"Yearning-go/src/lib"
+	"Yearning-go/src/model"
+	"encoding/json"
+	"fmt"
+	"github.com/cookieY/yee"
+	"github.com/golang-jwt/jwt"
+	"golang.org/x/net/websocket"
+	"io"
+	"net/http"
+)
+
+func PersonalFetchMyOrder(c yee.Context) (err error) {
+	websocket.Handler(func(ws *websocket.Conn) {
+		defer ws.Close()
+		valid, err := lib.WSTokenIsValid(ws.Request().Header.Get("Sec-WebSocket-Protocol"))
+		if err != nil {
+			c.Logger().Error(err)
+			return
+		}
+		if valid {
+			var u common.PageList[[]model.CoreSqlOrder]
+			var b []byte
+			for {
+				if err := websocket.Message.Receive(ws, &b); err != nil {
+					if err != io.EOF {
+						c.Logger().Error(err)
+					}
+					break
+				}
+				if string(b) == "ping" {
+					continue
+				}
+				if err := json.Unmarshal(b, &u); err != nil {
+					c.Logger().Error(err)
+					break
+				}
+				token, err := lib.WsTokenParse(ws.Request().Header.Get("Sec-WebSocket-Protocol"))
+				if err != nil {
+					c.Logger().Error(err)
+					break
+				}
+				user := token.Claims.(jwt.MapClaims)["name"].(string)
+				u.Paging().Select(common.QueryField).Query(
+					common.AccordingToAllOrderType(u.Expr.Type),
+					common.AccordingToAllOrderState(u.Expr.Status),
+					common.AccordingToUsernameEqual(user),
+					common.AccordingToDate(u.Expr.Picker),
+					common.AccordingToText(u.Expr.Text),
+					common.AccordingToWorkId(u.Expr.WorkId),
+				)
+				if err = websocket.Message.Send(ws, lib.ToJson(u.ToMessage())); err != nil {
+					c.Logger().Error(err)
+					break
+				}
+			}
+		}
+	}).ServeHTTP(c.Response(), c.Request())
+	return nil
+}
+
+func PersonalUserEdit(c yee.Context) (err error) {
+	u := new(model.CoreAccount)
+	if err = c.Bind(u); err != nil {
+		return c.JSON(http.StatusOK, common.ERR_REQ_BIND)
+	}
+
+	jsonData, err := json.Marshal(u)
+	if err != nil {
+		fmt.Println("Error marshalling data:", err)
+	} else {
+		fmt.Println("Received data from frontend:", string(jsonData))
+	}
+
+	user := new(lib.Token).JwtParse(c)
+	if u.Password == "" {
+		model.DB().Model(&model.CoreAccount{}).Where("username = ?", user.Username).Updates(
+			&model.CoreAccount{
+				Email:      u.Email,
+				RealName:   u.RealName,
+				Department: u.Department,
+			})
+	} else {
+		model.DB().Model(&model.CoreAccount{}).Where("username = ?", user.Username).Updates(
+			&model.CoreAccount{
+				Password:   lib.DjangoEncrypt(u.Password, string(lib.GetRandom())),
+				Email:      u.Email,
+				RealName:   u.RealName,
+				Department: u.Department,
+			})
+	}
+
+	// 根据用户选择更新 MFA 开关状态和密钥
+	if u.IsMfa == 0 {
+		// 如果用户关闭了 MFA，更新数据库中的状态
+		if err := model.DB().Model(&model.CoreAccount{}).Where("username = ?", user.Username).Updates(map[string]interface{}{
+			"is_mfa": u.IsMfa,
+		}).Error; err != nil {
+			return err
+		}
+	} else if u.IsMfa == 1 {
+		// 如果用户开启了 MFA，验证密钥后更新数据库中的状态
+		var userSecret model.CoreAccount
+		model.DB().Select("secret").Model(model.CoreAccount{}).Where("username =?", user.Username).First(&userSecret)
+		if u.Secret == userSecret.Secret {
+			if err := model.DB().Model(&model.CoreAccount{}).Where("username = ?", user.Username).Updates(map[string]interface{}{
+				"is_mfa": u.IsMfa,
+			}).Error; err != nil {
+				return err
+			}
+		} else {
+			return c.JSON(http.StatusOK, common.ERR_COMMON_TEXT_MESSAGE("secret validation failed"))
+		}
+	}
+
+	return c.JSON(http.StatusOK, common.SuccessPayLoadToMessage(i18n.DefaultLang.Load(i18n.CUSTOM_PASSWORD_SUCCESS)))
+}
+
+func Get(c yee.Context) (err error) {
+	switch c.Params("tp") {
+	case "list":
+		return PersonalFetchMyOrder(c)
+	default:
+		return c.JSON(http.StatusOK, common.ERR_REQ_FAKE)
+	}
+}

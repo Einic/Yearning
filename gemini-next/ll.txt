@@ -1,0 +1,13 @@
+
+> gemini-next@3.0.8 build
+> vue-tsc --noEmit && vite build  --mode release
+
+src/views/login/mfa.vue(31,1): error TS1232: An import declaration can only be used at the top level of a namespace or module.
+src/views/login/mfa.vue(31,26): error TS2307: Cannot find module '@/store' or its corresponding type declarations.
+src/views/login/mfa.vue(32,1): error TS1232: An import declaration can only be used at the top level of a namespace or module.
+src/views/login/mfa.vue(32,26): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+
+> gemini-next@3.0.8 build
+> vue-tsc --noEmit && vite build  --mode release
+
+终止批处理操作吗(Y/N)? 

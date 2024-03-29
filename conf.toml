@@ -1,0 +1,27 @@
+[Mysql]
+Db = "Yearning_go"
+Host = "192.168.200.129"
+Port = "3306"
+Password = "CZr9*ncyJfzHwHyq"
+User = "root"
+
+[General]
+SecretKey = "dbcjqheupqjsuwsm" #SecretKey is the salt for token/ database password encryption/decryption. Please keep it safe. must contain 16 characters
+RpcAddr = "192.168.200.132:50001" # SQL checker rpc server address
+#HttpAddr = "0.0.0.0:9000" # dingding message transformed wechat message, default relay server address '0.0.0.0:50002'
+LogLevel = "debug"  # debug,info,warn,error
+Lang = "zh_CN"  # en_US,zh_CN
+
+#[Oidc]
+#Enable = false
+#ClientId = "yearning"
+#ClientSecret = "fefehelj23jlj22f3jfjdfd"
+#Scope = "openid profile"
+#AuthUrl = "https://keycloak.xxx.ca/auth/realms/master/protocol/openid-connect/auth"
+#TokenUrl = "https://keycloak.xxx.ca/auth/realms/master/protocol/openid-connect/token"
+#UserUrl = "https://keycloak.xxx.ca/auth/realms/master/protocol/openid-connect/userinfo"
+#RedirectUrL = "http://127.0.0.1:8000/oidc/_token-login"
+#UserNameKey = "preferred_username"
+#RealNameKey = "name"
+#EmailKey = "email"
+#SessionKey = "session_state"

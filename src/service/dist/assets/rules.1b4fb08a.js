@@ -1,0 +1,1 @@
+import{J as t,K as a}from"./index.66cc4c36.js";function o(){return t.post(`${a}/manage/roles/global`)}function u(e){return t.post(`${a}/manage/roles/global_updated`,e)}function n(){return t.post(`${a}/manage/roles/list`)}function r(e){return t.post(`${a}/manage/roles/updated`,e)}function l(e){return t.post(`${a}/manage/roles/add`,e)}export{l as a,r as b,o as c,n as g,u};
