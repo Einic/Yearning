@@ -9,14 +9,13 @@ require (
 	github.com/cookieY/yee v0.5.1
 	github.com/deckarep/golang-set/v2 v2.6.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-sql-driver/mysql v1.7.1
+	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/protobuf v1.5.3
 	github.com/google/uuid v1.5.0
 	github.com/gookit/gcli/v3 v3.2.3
 	github.com/pquerna/otp v1.4.0
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/stretchr/testify v1.8.4
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	golang.org/x/crypto v0.17.0
@@ -29,6 +28,7 @@ require (
 )
 
 require (
+	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
