@@ -10,6 +10,7 @@ git_push.sh
 
 webpage/dist
 # Distribution / packaging
+gemini-next/.gitignore
 gemini-next/.vite.config.ts
 gemini-next/node_modules
 gemini-next/.DS_Store
