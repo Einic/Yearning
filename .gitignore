@@ -10,7 +10,7 @@ conf.toml
 
 webpage/dist
 # Distribution / packaging
-gemini-next/vite.config.ts-dev
+gemini-next/*.ts-dev
 .Python
 src/deploy.conf
 src/dist
