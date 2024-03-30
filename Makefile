@@ -13,9 +13,11 @@ SHELL = /usr/bin/env bash -o pipefail
 
 
 CWD := $(shell pwd)
+PREFIX := v
 VERSION := 3.1.7-1
-#LDFLAGS := "-s -w -X main.version=${VERSION}"
-LDFLAGS := "-s -w "
+EXECUTABLE := Yearning
+GOARCH := amd64
+LDFLAGS := "-s -w -X main.version=$(VERSION)"
 RELEASE = $(shell date +"%Y%m%d")
 KERNEL_VERSION := $(shell uname -r|grep -oP '\.el(\d+)\.' | sed -n 's/\.el\([0-9]\+\)\./el\1/p')
 ARCH := $(shell uname -m)
@@ -35,7 +37,7 @@ all: build
 
 ##@ General
 ver:
-	@echo ${VERSION}
+	@echo $(PREFIX)${VERSION}
 
 .PHONY: help
 help: ## Display this help.
@@ -61,28 +63,38 @@ test: manifests generate fmt vet envtest ## Run tests.
 	go test ./... -coverprofile cover.out
 
 ##@ Build
-.PHONY: gemini-install
-gemini-install:
+.PHONY: yarn-install
+yarn-install:
 	cd gemini-next
-	npm install
+	yarn install
 
-.PHONY: gemini-build
-gemini-build:
+.PHONY: yarn-dev
+yarn-dev:
 	cd gemini-next
-	npm run build && cp -r dist ../src/service/
+	yarn run dev
+
+.PHONY: yarn-serve
+yarn-serve:
+	cd gemini-next
+	yarn run serve
+
+.PHONY: yarn-build
+yarn-build:
+	cd gemini-next
+	yarn run build && cp -r dist ../src/service/
 
 .PHONY: linux-build
 #linux-build: generate fmt vet ## Build manager linux binary.
 linux-build: ## Build manager linux binary.
-	go build -ldflags=${LDFLAGS} -o bin/Yearning main.go && find bin/Yearning -type f -executable | xargs -i upx -qq {}
+	go build -ldflags=$(LDFLAGS) -o bin/$(EXECUTABLE) main.go && find bin/$(EXECUTABLE) -type f -executable | xargs -i upx -qq {}
 
 .PHONY: darwin-build
 darwin-build: generate fmt vet ## Build manager darwin binary.
-	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags=${LDFLAGS} -o bin/Yearning main.go && find bin/Yearning_darwin -type f -executable | xargs -i upx -qq {}
+	CGO_ENABLED=0 GOOS=darwin GOARCH=$(GOARCH) go build -ldflags=$(LDFLAGS) -o bin/$(EXECUTABLE) main.go && find bin/$(EXECUTABLE)_darwin -type f -executable | xargs -i upx -qq {}
 
 .PHONY: win-build
 win-build: generate fmt vet ## Build manager windows binary.
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags=${LDFLAGS} -o bin/Yearning.exe main.go && find bin/Yearning.exe -type f -executable | xargs -i upx -qq {}
+	CGO_ENABLED=0 GOOS=windows GOARCH=$(GOARCH) go build -ldflags=$(LDFLAGS) -o bin/$(EXECUTABLE).exe main.go && find bin/$(EXECUTABLE).exe -type f -executable | xargs -i upx -qq {}
 
 .PHONY: run
 #run: manifests generate fmt vet ## Run a controller from your host.
@@ -93,10 +105,8 @@ run:
 build: linux-build ## Build manager linux rpm binary.
 	$(README_COPY_CMD)
 	$(CONF_TEMPLATE_COPY_CMD)
-	sed -i "s/VERSION/$(VERSION)/g" rpm.json
-	sed -i "s/RELEASE/$(RELEASE)/g" rpm.json
 	mkdir -p rpms
-	go-bin-rpm generate -f rpm.json -o ./rpms/Yearning-$(VERSION)-$(RELEASE).$(KERNEL_VERSION).$(ARCH).rpm
+	go-bin-rpm generate -f rpm.json -o ./rpms/$(EXECUTABLE)-$(PREFIX)$(VERSION)-$(RELEASE).$(KERNEL_VERSION).$(ARCH).rpm
 
 .PHONY: clean
 clean:
@@ -108,6 +118,11 @@ clean:
 ifndef ignore-not-found
   ignore-not-found = false
 endif
+
+
+# npm install -g yarn
+# yarn config set registry https://registry.npmmirror.com -g
+# yarn config set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass -g
 
 # rpm Install before packaging, Please use the TAB key to replace spaces
 # 1. https://github.com/mh-cbon/go-bin-rpm
