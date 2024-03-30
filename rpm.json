@@ -1,0 +1,40 @@
+{
+  "name": "Yearning",
+  "version": "3.1.7-1",
+  "release": "1.el7",
+  "arch": "x86_64",
+  "summary": "Einic Yeo",
+  "description": "      Seamlessly integrates SQL detection and query auditing, tailored for the use of DBAs and developers. A locally deployed, privacy-focused, simple and efficient for MYSQL audit platform.",
+  "license": "Infvie License",
+  "url": "https://github.com/Einic/!name!",
+  "directories": [
+    {
+      "path": "/usr/local/!name!/",
+      "permissions": "0755"
+    }
+  ],
+  "files": [
+    {
+      "from": "./bin/!name!",
+      "to": "/usr/local/!name!",
+      "base": "",
+      "type": ""
+    },
+    {
+      "from": "README.md",
+      "to": "/usr/local/!name!",
+      "base": "",
+      "type": ""
+    },
+    {
+      "from": "conf.toml.template",
+      "to": "/usr/local/!name!/bin",
+      "base": "",
+      "type": ""
+    }
+  ],
+  "envs": {
+    "YEARNING": "/usr/local/Yearning/",
+    "PATH": "$YEARNING/bin:$PATH"
+  }
+}

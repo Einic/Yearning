@@ -13,7 +13,7 @@ SHELL = /usr/bin/env bash -o pipefail
 
 
 CWD := $(shell pwd)
-VERSION := "v3.1.7.1"
+VERSION := 3.1.7-1
 #LDFLAGS := "-s -w -X main.version=${VERSION}"
 LDFLAGS := "-s -w "
 RELEASE = $(shell date +"%Y%m%d")
@@ -23,6 +23,10 @@ ARCH := $(shell uname -m)
 README_SRC_FILE = README.md
 README_DEST_FILE = "./bin/README.md"
 README_COPY_CMD = cp $(README_SRC_FILE) $(README_DEST_FILE)
+
+CONF_TEMPLATE_SRC_FILE = conf.toml.template
+CONF_TEMPLATE_DEST_FILE = "./bin/conf.toml.template"
+CONF_TEMPLATE_COPY_CMD = cp $(CONF_TEMPLATE_SRC_FILE) $(CONF_TEMPLATE_DEST_FILE)
 
 .PHONY: all
 all: build
@@ -87,9 +91,8 @@ run:
 
 .PHONY: build
 build: linux-build ## Build manager linux rpm binary.
-#	$(CRON_COPY_CMD)
-#	$(ENV_COPY_CMD)
 	$(README_COPY_CMD)
+	$(CONF_TEMPLATE_COPY_CMD)
 	sed -i "s/VERSION/$(VERSION)/g" rpm.json
 	sed -i "s/RELEASE/$(RELEASE)/g" rpm.json
 	mkdir -p rpms
@@ -97,7 +100,8 @@ build: linux-build ## Build manager linux rpm binary.
 
 .PHONY: clean
 clean:
-	rm -rf pkg-build
+	cp ./rpms/*.rpm ./bin
+	rm -rf pkg-build rpms
 
 ##@ Deployment
 
