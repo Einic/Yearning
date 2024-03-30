@@ -11,6 +11,14 @@ conf.toml
 webpage/dist
 # Distribution / packaging
 gemini-next/.vite.config.ts
+gemini-next/node_modules
+gemini-next/.DS_Store
+gemini-next/dist
+gemini-next/dist-ssr
+gemini-next/*.local
+gemini-next/.vscode
+gemini-next/package-lock.json
+gemini-next/yarn-error.log
 .Python
 src/deploy.conf
 src/dist
