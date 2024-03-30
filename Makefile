@@ -17,10 +17,11 @@ PREFIX := v
 VERSION := 3.1.7-1
 EXECUTABLE := Yearning
 GOARCH := amd64
+#GOARCH := arm64
 LDFLAGS := "-s -w -X main.version=$(VERSION)"
 RELEASE = $(shell date +"%Y%m%d")
 KERNEL_VERSION := $(shell uname -r|grep -oP '\.el(\d+)\.' | sed -n 's/\.el\([0-9]\+\)\./el\1/p')
-ARCH := $(shell uname -m)
+RCH := $(shell uname -m)
 
 README_SRC_FILE = README.md
 README_DEST_FILE = "./bin/README.md"
@@ -86,7 +87,7 @@ yarn-build:
 .PHONY: linux-build
 #linux-build: generate fmt vet ## Build manager linux binary.
 linux-build: ## Build manager linux binary.
-	go build -ldflags=$(LDFLAGS) -o bin/$(EXECUTABLE) main.go && find bin/$(EXECUTABLE) -type f -executable | xargs -i upx -qq {}
+	CGO_ENABLED=0 GOOS=linux GOARCH=$(GOARCH) go build -ldflags=$(LDFLAGS) -o bin/$(EXECUTABLE) main.go && find bin/$(EXECUTABLE) -type f -executable | xargs -i upx -qq {}
 
 .PHONY: darwin-build
 darwin-build: generate fmt vet ## Build manager darwin binary.
@@ -102,11 +103,18 @@ run:
 	go run ./main.go run
 
 .PHONY: build
-build: linux-build ## Build manager linux rpm binary.
+build: ## Build manager linux rpm binary.(eg: make ARCH=arm64 build;make ARCH=amd64 build)
 	$(README_COPY_CMD)
 	$(CONF_TEMPLATE_COPY_CMD)
 	mkdir -p rpms
-	go-bin-rpm generate -f rpm.json -o ./rpms/$(EXECUTABLE)-$(PREFIX)$(VERSION)-$(RELEASE).$(KERNEL_VERSION).$(ARCH).rpm
+	@if [ "$(ARCH)" = "amd64" ]; then \
+		go-bin-rpm generate -f rpm.json -o ./rpms/$(EXECUTABLE)-$(PREFIX)$(VERSION)-$(RELEASE).$(KERNEL_VERSION).$(ARCH).$(RCH).rpm; \
+	elif [ "$(ARCH)" = "arm64" ]; then \
+		GOARCH=arm64 $(MAKE) linux-build; \
+		go-bin-rpm generate -f rpm.json -o ./rpms/$(EXECUTABLE)-$(PREFIX)$(VERSION)-$(RELEASE).$(KERNEL_VERSION).$(ARCH).$(RCH).rpm; \
+	else \
+		echo "Unsupported architecture $(ARCH)"; \
+	fi
 
 .PHONY: clean
 clean:
@@ -123,6 +131,7 @@ endif
 # npm install -g yarn
 # yarn config set registry https://registry.npmmirror.com -g
 # yarn config set sass_binary_site https://cdn.npmmirror.com/binaries/node-sass -g
+# yarn add vite
 
 # rpm Install before packaging, Please use the TAB key to replace spaces
 # 1. https://github.com/mh-cbon/go-bin-rpm

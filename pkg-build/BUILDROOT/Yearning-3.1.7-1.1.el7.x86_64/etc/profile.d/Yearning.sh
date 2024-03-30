@@ -1,7 +1,7 @@
 #!/bin/bash
 
-PATH=$YEARNING/bin:$PATH
 YEARNING=/usr/local/Yearning/
+PATH=$YEARNING/bin:$PATH
 
 export YEARNING
 export PATH
