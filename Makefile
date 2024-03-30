@@ -109,7 +109,6 @@ ifndef ignore-not-found
   ignore-not-found = false
 endif
 
-#请使用TAB键替换空格，
-#rpm 打包前安装
-#1.https://github.com/mh-cbon/go-bin-rpm
-#2.yum install -y gcc make rpm-build redhat-rpm-config
+# rpm Install before packaging, Please use the TAB key to replace spaces
+# 1. https://github.com/mh-cbon/go-bin-rpm
+# 2. yum install -y gcc make rpm-build redhat-rpm-config
